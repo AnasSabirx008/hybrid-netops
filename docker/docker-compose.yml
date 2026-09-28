@@ -66,16 +66,19 @@ networks:
   net-admin:
     name: hybrid-net-admin
     driver: bridge
-
+    driver_opts:
+      com.docker.network.bridge.gateway_mode_ipv4: routed
     ipam:
       config:
         - subnet: 10.20.10.0/24
-
+          gateway: 10.20.10.254
 
   net-servers:
     name: hybrid-net-servers
     driver: bridge
-
+    driver_opts:
+      com.docker.network.bridge.gateway_mode_ipv4: routed
     ipam:
       config:
         - subnet: 10.20.20.0/24
+          gateway: 10.20.20.254
