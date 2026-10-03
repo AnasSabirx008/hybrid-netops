@@ -1,0 +1,41 @@
+---
+- name: Configure HybridNetOps firewall
+  hosts: edge-router
+  become: true
+  gather_facts: false
+
+  tasks:
+
+    - name: Set FORWARD default policy to DROP
+      ansible.builtin.command:
+        cmd: iptables -P FORWARD DROP
+
+    - name: Flush existing FORWARD rules
+      ansible.builtin.command:
+        cmd: iptables -F FORWARD
+
+    - name: Allow established and related traffic
+      ansible.builtin.iptables:
+        chain: FORWARD
+        ctstate:
+          - ESTABLISHED
+          - RELATED
+        jump: ACCEPT
+
+    - name: Allow ADMIN to SERVERS
+      ansible.builtin.iptables:
+        chain: FORWARD
+        source: 10.20.10.0/24
+        destination: 10.20.20.0/24
+        ctstate:
+          - NEW
+        jump: ACCEPT
+
+    - name: Deny SERVERS to ADMIN
+      ansible.builtin.iptables:
+        chain: FORWARD
+        source: 10.20.20.0/24
+        destination: 10.20.10.0/24
+        ctstate:
+          - NEW
+        jump: DROP

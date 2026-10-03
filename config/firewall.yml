@@ -1,0 +1,13 @@
+firewall:
+  default_policy: DROP
+
+  forwarding:
+    - name: allow_admin_to_servers
+      source: 10.20.10.0/24
+      destination: 10.20.20.0/24
+      action: ACCEPT
+
+    - name: deny_servers_to_admin
+      source: 10.20.20.0/24
+      destination: 10.20.10.0/24
+      action: DROP

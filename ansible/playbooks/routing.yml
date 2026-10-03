@@ -1,0 +1,30 @@
+---
+- name: Verify HybridNetOps routing
+  hosts: edge-router
+  gather_facts: false
+
+  vars:
+    router_container: edge-router
+
+  tasks:
+
+    - name: Verify IPv4 forwarding
+      ansible.builtin.command:
+        cmd: docker exec {{ router_container }} cat /proc/sys/net/ipv4/ip_forward
+      register: ip_forward
+      changed_when: false
+      failed_when: ip_forward.stdout.strip() != '1'
+
+    - name: Display routing table
+      ansible.builtin.command:
+        cmd: docker exec {{ router_container }} ip route
+      register: router_routes
+      changed_when: false
+
+    - name: Display IPv4 forwarding state
+      ansible.builtin.debug:
+        msg: "IPv4 forwarding = {{ ip_forward.stdout.strip() }}"
+
+    - name: Display routing table
+      ansible.builtin.debug:
+        var: router_routes.stdout_lines
